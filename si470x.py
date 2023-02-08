@@ -12,11 +12,15 @@ class SI4703(object):
     self.i2c_addr = i2c_addr
     self.reset_pin = reset_pin
     self.volume = 0
+    self.tuning = tuning
+    self.reinitialize()
+
+  def reinitialize(self):
     # Powerup sequence.
     self.reset()
     self.initialize()
-    if tuning:
-      self.tune(tuning)
+    if self.tuning:
+      self.tune(self.tuning)
     
   def reset(self):
     # Boot si4703 into i2c mode by pulling reset low while i2c SDA is low.
@@ -62,6 +66,7 @@ class SI4703(object):
     #print("+pwr:", list(hex(r) for r in regs))
 
   def tune(self, freq):
+    self.tuning = freq
     regs = self.getregs()
     band_range = [(87.5, 107.0), (76.0, 108.0), (76.0, 90.0)][(regs[5] >> 6) & 3]
     spacing = [0.05, 0.1, 0.2][(regs[5] >> 4) & 3]
